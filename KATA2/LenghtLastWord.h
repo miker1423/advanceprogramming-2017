@@ -1,0 +1,1 @@
+int lastWordLenght(char*);
