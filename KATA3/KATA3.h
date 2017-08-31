@@ -1,0 +1,1 @@
+int canBeBuild(char* ransomNote, char* magazine);
