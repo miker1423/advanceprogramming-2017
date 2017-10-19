@@ -20,7 +20,7 @@
 *  010 = 2 -> this is the comlement of 5   
 */
 int findComplement(int number){
-    long i;
+    unsigned int i;
     for(i = 1; i <= number; i *= 2){
         number ^= i;
     }
