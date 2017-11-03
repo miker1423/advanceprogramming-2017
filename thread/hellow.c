@@ -7,36 +7,48 @@
 
 #define NUM_THREADS 5
 
-unsigned int total;
-sem_t sem1;
+sem_t[] forks;
 
-void *add100(void *threadid)
-{
-   long tid;
-   tid = (long)threadid;
-   unsigned int localTotal;
-   printf("Adding 100 #%ld!\n", tid);
-   sem_wait(&sem1);
-   localTotal = total;
-   localTotal += 100;
-   sleep(tid%5);
-   total = localTotal;
-   sem_post(&sem1);
-   pthread_exit(NULL);
+void thinking(int n){
+    sleep(rand()%n);
 }
+
+void eating(int n){
+    sleep(rand()%n);
+}
+
+void *lifeStyle(void *threadid)
+{
+    long tid;
+    tid = (long) threadid;
+    while(1){
+        thinking(3);
+        printf("Im phil %lu, I am hungry\n", tid);
+        sem_wait(forks[tid]);
+        sem_wait(forks[(tid+1)%NUM_THREADS]);
+        eating(4);
+
+        sem_post(forks[tid]);
+        sem_post(forks[(tid+1)%NUM_THREADS]);
+        printf("Im phil %lu, Im thinking\n", tid);
+    }
+}
+
+
 
 int main (int argc, char *argv[])
 {
    pthread_t threads[NUM_THREADS];
    int rc;
    long t;
-   sem_init(&sem1, 1, 1);
 
-   printf("Initial total = %d \n", total);
+   for(t=0; t<NUM_THREADS; t++){
+       sem_init(&forks[t], 1, 1)
+    }
 
    for(t=0; t<NUM_THREADS; t++){
       printf("In main: creating thread %ld\n", t);
-      rc = pthread_create(&threads[t], NULL, add100, (void *)t);
+      rc = pthread_create(&threads[t], NULL, lifeStyle, (void *)t);
       if (rc){
          printf("ERROR; return code from pthread_create() is %d\n", rc);
          exit(-1);
@@ -46,8 +58,6 @@ int main (int argc, char *argv[])
    for(t = 0; t < NUM_THREADS; t++){
        pthread_join(threads[t], NULL);
    }
-
-   printf("Las total = %d\n", total);
 
    /* Last thing that main() should do */
    pthread_exit(NULL);
