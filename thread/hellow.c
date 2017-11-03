@@ -1,18 +1,27 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <semaphore.h>
 #include "hellow.h"
 
-#define NUM_THREADS     5
+#define NUM_THREADS 5
 
 unsigned int total;
+sem_t sem1;
 
 void *add100(void *threadid)
 {
    long tid;
    tid = (long)threadid;
+   unsigned int localTotal;
    printf("Adding 100 #%ld!\n", tid);
-   total += 100;
+   sem_wait(&sem1);
+   localTotal = total;
+   localTotal += 100;
+   sleep(tid%5);
+   total = localTotal;
+   sem_post(&sem1);
    pthread_exit(NULL);
 }
 
@@ -21,6 +30,7 @@ int main (int argc, char *argv[])
    pthread_t threads[NUM_THREADS];
    int rc;
    long t;
+   sem_init(&sem1, 1, 1);
 
    printf("Initial total = %d \n", total);
 
