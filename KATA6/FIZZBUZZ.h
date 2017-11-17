@@ -1,1 +1,0 @@
-char** FizzBuzz(int n);

@@ -1,4 +1,0 @@
-temp 15
-temp 23
-temp 45
-temp 60
